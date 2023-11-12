@@ -2,29 +2,28 @@ from typing import TypeVar
 
 from pydantic import AnyHttpUrl, BaseModel
 
-from ._protocols import (
-    SoundcloudClientProtocol,
-    SoundcloudTrackProtocol,
-)
+from ._protocols import SoundcloudClientProtocol, SoundcloudTrackProtocol
 
 M = TypeVar("M")
 
 
 class BaseSoundcloudModel(BaseModel):
-    """ Base model with id and uri attributes. """
+    """Base model with id and uri attributes."""
+
     _client: SoundcloudClientProtocol
     id: int
     uri: AnyHttpUrl
 
 
 class SoundcloudPaginableModel(BaseModel):
-    """ Base container for paginable collection. """
+    """Base container for paginable collection."""
+
     collection: list(M)
     next_href: AnyHttpUrl
 
 
 class SoundcloudCommentModel(BaseSoundcloudModel):
-    """ @see: 
+    """@see:
     https://developers.soundcloud.com/docs/api/explorer/open-api#model-Comment
     """
 
@@ -36,7 +35,7 @@ class SoundcloudCommentModel(BaseSoundcloudModel):
 
 
 class SoundcloudCommentsModel(SoundcloudPaginableModel):
-    """ @see: 
+    """@see:
     https://developers.soundcloud.com/docs/api/explorer/open-api#model-Comments
     """
 
@@ -44,7 +43,7 @@ class SoundcloudCommentsModel(SoundcloudPaginableModel):
 
 
 class SoundcloudTrack(BaseSoundcloudModel, SoundcloudTrackProtocol):
-    """ @see: 
+    """@see:
     https://developers.soundcloud.com/docs/api/explorer/open-api#model-Track
     """
 

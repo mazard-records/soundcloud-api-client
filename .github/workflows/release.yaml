@@ -15,6 +15,6 @@ jobs:
         with:
           python-version: '3.x'
       - run: poetry install --no-root
-      - uses: pypa/gh-action-pypi-publish@v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
+      - run: poetry build
+      - run: poetry config pypi-token.pypi "${{ secrets.PYPI_TOKEN }}"
+      - run: poetry publish

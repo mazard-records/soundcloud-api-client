@@ -33,7 +33,7 @@ async def get_client_id() -> str:
 
 def _get_normalized_url(url: str) -> str:
     if url.startswith(DEFAULT_FRONT_URL):
-        url = url[len(DEFAULT_FRONT_URL):]
+        url = url[len(DEFAULT_FRONT_URL) :]
     if not url.startswith("/"):
         url = f"/{url}"
     if "?" in url:

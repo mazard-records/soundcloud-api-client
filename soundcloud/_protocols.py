@@ -6,7 +6,6 @@ class SoundcloudTrackProtocol(Protocol):
 
 
 class SoundcloudClientProtocol(Protocol):
-
     def track(
         self,
         track_id_or_url: Union[int, str],

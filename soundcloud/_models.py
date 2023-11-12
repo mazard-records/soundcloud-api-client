@@ -1,16 +1,26 @@
-from typing import TypeVar
+import json
+from typing import Any, Optional, TypeVar
 
 from pydantic import AnyHttpUrl, BaseModel
 
-from ._protocols import SoundcloudClientProtocol, SoundcloudTrackProtocol
+from ._protocols import (
+    SoundcloudClientProtocol,
+    SoundcloudCommentsProtocol,
+    SoundcloudTrackProtocol,
+)
 
 M = TypeVar("M")
+
+
+class SoundcloudHydrationItem(BaseModel):
+    hydratable: str
+    data: Any
 
 
 class BaseSoundcloudModel(BaseModel):
     """Base model with id and uri attributes."""
 
-    _client: SoundcloudClientProtocol
+    _client: Optional[SoundcloudClientProtocol] = None
     id: int
     uri: AnyHttpUrl
 
@@ -18,11 +28,11 @@ class BaseSoundcloudModel(BaseModel):
 class SoundcloudPaginableModel(BaseModel):
     """Base container for paginable collection."""
 
-    collection: list(M)
+    collection: list[M]
     next_href: AnyHttpUrl
 
 
-class SoundcloudCommentModel(BaseSoundcloudModel):
+class SoundcloudComment(BaseSoundcloudModel):
     """@see:
     https://developers.soundcloud.com/docs/api/explorer/open-api#model-Comment
     """
@@ -34,12 +44,12 @@ class SoundcloudCommentModel(BaseSoundcloudModel):
     user_id: int
 
 
-class SoundcloudCommentsModel(SoundcloudPaginableModel):
+class SoundcloudComments(SoundcloudPaginableModel, SoundcloudCommentsProtocol):
     """@see:
     https://developers.soundcloud.com/docs/api/explorer/open-api#model-Comments
     """
 
-    collection: list(SoundcloudCommentModel)
+    collection: list[SoundcloudComment]
 
 
 class SoundcloudTrack(BaseSoundcloudModel, SoundcloudTrackProtocol):
@@ -51,10 +61,21 @@ class SoundcloudTrack(BaseSoundcloudModel, SoundcloudTrackProtocol):
     artwork_url: AnyHttpUrl
     duration: int
     genre: str
-    isrc: str
-    key_signature: str
     permalink_url: AnyHttpUrl
     tag_list: str
 
-    def comments(self) -> SoundcloudCommentsModel:
+    @classmethod
+    def from_raw_hydration(
+        cls,
+        raw_hydration: str,
+    ) -> Optional["SoundcloudTrack"]:
+        hydration = json.loads(raw_hydration)
+        assert isinstance(hydration, list)
+        for object in hydration:
+            item = SoundcloudHydrationItem(**object)
+            if item.hydratable == "sound":
+                assert isinstance(item.data, dict)
+                return cls(**item.data)
+
+    def comments(self) -> SoundcloudComments:
         return self._client.comments(self.id)

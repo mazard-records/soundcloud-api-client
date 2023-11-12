@@ -1,8 +1,17 @@
+from abc import ABC, abstractmethod
 from typing import Protocol, Union
 
+from pydantic import AnyHttpUrl
 
-class SoundcloudTrackProtocol(Protocol):
-    ...
+
+class SoundcloudCommentsProtocol(ABC):
+    pass
+
+
+class SoundcloudTrackProtocol(ABC):
+    @abstractmethod
+    def comments(self) -> SoundcloudCommentsProtocol:
+        pass
 
 
 class SoundcloudClientProtocol(Protocol):
@@ -12,5 +21,5 @@ class SoundcloudClientProtocol(Protocol):
     ) -> SoundcloudTrackProtocol:
         pass
 
-    def comments(self, track_id: int) -> ...:
+    def comments(self, track_id: int) -> SoundcloudCommentsProtocol:
         pass

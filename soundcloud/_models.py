@@ -1,5 +1,5 @@
 import json
-from typing import Any, Optional, TypeVar
+from typing import Any, Generator, Optional, TypeVar
 
 from pydantic import AnyHttpUrl, BaseModel
 
@@ -28,6 +28,8 @@ class BaseSoundcloudModel(BaseModel):
 class SoundcloudPaginableModel(BaseModel):
     """Base container for paginable collection."""
 
+    _transport: Optional[SoundcloudClientProtocol] = None
+
     collection: list[M]
     next_href: AnyHttpUrl
 
@@ -38,7 +40,7 @@ class SoundcloudComment(BaseSoundcloudModel):
     """
 
     body: str
-    timestamp: str
+    timestamp: int
 
     track_id: int
     user_id: int
@@ -50,6 +52,24 @@ class SoundcloudComments(SoundcloudPaginableModel, SoundcloudCommentsProtocol):
     """
 
     collection: list[SoundcloudComment]
+
+    def __iter__(self):
+        if self._transport is None:
+            raise AttributeError()
+        
+        def iterable() -> Generator[SoundcloudComment, None, None]:
+            yield from self.collection
+            comments = self
+            while comments.next_href is not None:
+                response = self._transport.get(comments.next_href)
+                response.raise_for_status()
+                comments = SoundcloudComments(
+                    _transport=comments._transport,
+                    **response.json(),
+                )
+                yield from comments.collection
+
+        return iterable
 
 
 class SoundcloudTrack(BaseSoundcloudModel, SoundcloudTrackProtocol):

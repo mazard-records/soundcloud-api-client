@@ -36,7 +36,12 @@ class SoundcloudClient(object):
 
     def comments(self, track_id: int) -> ...:
         """ """
-        url = self._url(f"/tracks/{track_id}/comments")
+        url = self._url(
+            f"/tracks/{track_id}/comments",
+            limit=20,
+            linked_partitioning=1,
+            offset=0,
+        )
         response = self._transport.get(url)
         response.raise_for_status()
         return ...

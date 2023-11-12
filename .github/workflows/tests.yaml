@@ -1,0 +1,29 @@
+name: tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "poetry"
+      - run: poetry install --no-root
+      - run: poetry run isort --check soundcloud/ tests/
+      - run: poetry run black --check soundcloud/ tests/
+      - run: poetry run mypy --strict soundcloud/ tests/
+      - run: poetry run pytest tests/ --doctest-modules --junitxml=junit/test-results-${{ matrix.python-version }}.xml
+      - uses: actions/upload-artifact@v3
+        with:
+          name: pytest-results-${{ matrix.python-version }}
+          path: junit/test-results-${{ matrix.python-version }}.xml
+        if: ${{ always() }}

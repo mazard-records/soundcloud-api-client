@@ -1,16 +1,16 @@
-import re
 from functools import lru_cache
 from typing import Optional
 
 from httpx import AsyncClient
 
 from ._asynctool import aiter
+from ._const import (
+    DEFAULT_FRONT_URL,
+    PATTERN_HYDRATE,
+    PATTERN_SRCS,
+    PATTERN_VARIABLE,
+)
 from ._models import SoundcloudTrack
-
-DEFAULT_FRONT_URL = "https://soundcloud.com"
-PATTERN_SRCS = re.compile(r"<script crossorigin src=\"([^\"]+)\">")
-PATTERN_HYDRATE = re.compile(r"window.__sc_hydration = (\[\{.+\}\]);")
-PATTERN_VARIABLE = re.compile(r"\"client_id=([^\"]+)\"")
 
 
 @lru_cache(maxsize=10)

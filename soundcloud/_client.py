@@ -4,10 +4,10 @@ from urllib.parse import urlencode
 
 from httpx import Client
 
+from ._const import DEFAULT_API_URL
 from ._front import get_client_id, get_track_id_from_url
 from ._models import SoundcloudTrack
 
-DEFAULT_API_URL = "https://api-v2.soundcloud.com"
 
 
 class SoundcloudClient(object):

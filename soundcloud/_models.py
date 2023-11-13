@@ -13,6 +13,7 @@ M = TypeVar("M")
 
 
 class SoundcloudHydrationItem(BaseModel):
+    """ Simple model for front hydration parsing. """
     hydratable: str
     data: Any
 
@@ -47,7 +48,9 @@ class SoundcloudComment(BaseSoundcloudModel):
 
 
 class SoundcloudComments(SoundcloudPaginableModel, SoundcloudCommentsProtocol):
-    """@see:
+    """ Model 
+    
+    @see:
     https://developers.soundcloud.com/docs/api/explorer/open-api#model-Comments
     """
 
@@ -73,7 +76,9 @@ class SoundcloudComments(SoundcloudPaginableModel, SoundcloudCommentsProtocol):
 
 
 class SoundcloudTrack(BaseSoundcloudModel, SoundcloudTrackProtocol):
-    """@see:
+    """
+    
+    @see:
     https://developers.soundcloud.com/docs/api/explorer/open-api#model-Track
     """
 
